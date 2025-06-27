@@ -83,3 +83,40 @@ kubectl logs logoutput-86898fdb7c-522t7
 # Describe 
 kubectl describe <objects>
 ```
+# 1.3: Declarative approach
+
+## Instructions
+In your "Log output" application, create a folder for manifests and move your deployment into a declarative file.
+
+Make sure everything still works by restarting and following logs.
+
+# Solution
+```
+# Apply manifest
+kubectl apply -f manifests/deployment-log-output.yaml
+deployment.apps/log-output created
+
+
+# Update image
+docker build -t <image>:<new_tag>
+
+
+# Push to repository
+docker push <image>:<new_tag>
+docker push paulajuliabalza/log-output:1.0.1
+
+# Get pod
+NAME                         READY   STATUS    RESTARTS   AGE
+log-output-8d6469f9d-hq2ng   1/1     Running   0          2m53s
+
+# Get logs
+ kubectl logs log-output-8d6469f9d-hq2ng
+2025-06-27T00:55:55.487Z: 3801bd19-50ec-48fb-b442-64bc62a3739c
+2025-06-27T00:56:00.491Z: 3801bd19-50ec-48fb-b442-64bc62a3739c
+2025-06-27T00:56:05.495Z: 3801bd19-50ec-48fb-b442-64bc62a3739c
+2025-06-27T00:56:10.499Z: 3801bd19-50ec-48fb-b442-64bc62a3739c
+2025-06-27T00:56:15.504Z: 3801bd19-50ec-48fb-b442-64bc62a3739c
+2025-06-27T00:56:20.507Z: 3801bd19-50ec-48fb-b442-64bc62a3739c
+2025-06-27T00:56:25.511Z: 3801bd19-50ec-48fb-b442-64bc62a3739c
+2025-06-27T00:56:30.515Z: 3801bd19-50ec-48fb-b442-64bc62a3739c
+```
