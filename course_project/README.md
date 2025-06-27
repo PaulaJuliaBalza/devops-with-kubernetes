@@ -34,3 +34,18 @@ Server started in port 3000
 # Cleanup
 kubectl delete deployment todo-app
 ```
+
+# 1.4: The project, step 2
+
+## Instructions
+Create a deployment.yaml for the course project (that you started in Exercise 1.2.)
+
+You won't have access to the port yet but that'll come soon.
+
+## Solution
+```
+# Apply manifest
+kubectl apply -f manifests/deployment-todoapp.yaml
+deployment.apps/todo-app created
+
+```
