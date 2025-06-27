@@ -49,3 +49,78 @@ kubectl apply -f manifests/deployment-todoapp.yaml
 deployment.apps/todo-app created
 
 ```
+
+# 1.5: The project, step 3
+
+## Instructions
+Make the project respond something to a GET request sent to the / url of the project. A simple HTML page is good, or you can deploy something more complex, like a single-page application.
+
+Define Environment Variables for a Container
+https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/ 
+
+Use kubectl port-forward to confirm that the project is accessible and works in the cluster by using a browser to access the project.
+
+## Solution
+```
+# Build Docker Image
+docker build -t paulajuliabalza/todo-app:1.5 .
+
+# Push the image to Docker Hub
+docker push paulajuliabalza/todo-app:1.5
+
+# Apply the deployment
+kubectl apply -f course_project/manifests/deployment-todoapp.yaml
+deployment.apps/todo-app configured
+
+# Get pods
+kubectl get pos
+todo-app-7bfbdb5f99-lwbv8    1/1     Running   0              86s
+
+# Get Logs
+kubectl logs todo-app-7bfbdb5f99-lwbv8
+Server started in port 3000
+[2025-06-27T13:35:26.655Z] Todo App heartbeat on port 3000
+[2025-06-27T13:35:31.659Z] Todo App heartbeat on port 3000
+[2025-06-27T13:35:36.663Z] Todo App heartbeat on port 3000
+
+
+# Port Forward to access the application
+kubectl port-forward deployment/todo-app 8080:3000
+Forwarding from 127.0.0.1:8080 -> 3000
+Forwarding from [::1]:8080 -> 3000
+
+# Access the application
+Open your browser and go to http://localhost:8080 
+curl http://localhost:8080
+
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Todo App</title>
+        </head>
+        <body>
+          <h1>Todo App</h1>
+          <p>This is a simple todo application.</p>
+        </body>
+      </html>
+
+
+# List pod env vars
+kubectl exec <pod-name> -- printenv
+kubectl exec todo-app-7bfbdb5f99-lwbv8 -- printenv
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+HOSTNAME=todo-app-7bfbdb5f99-lwbv8
+NODE_VERSION=18.20.8
+YARN_VERSION=1.22.22
+PORT=3000
+KUBERNETES_SERVICE_PORT=443
+KUBERNETES_SERVICE_PORT_HTTPS=443
+KUBERNETES_PORT=tcp://10.43.0.1:443
+KUBERNETES_PORT_443_TCP=tcp://10.43.0.1:443
+KUBERNETES_PORT_443_TCP_PROTO=tcp
+KUBERNETES_PORT_443_TCP_PORT=443
+KUBERNETES_PORT_443_TCP_ADDR=10.43.0.1
+KUBERNETES_SERVICE_HOST=10.43.0.1
+HOME=/root
+
+```

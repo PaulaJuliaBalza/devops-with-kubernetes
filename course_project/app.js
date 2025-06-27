@@ -4,8 +4,24 @@ const http = require('http');
 const PORT = process.env.PORT || 3000;
 
 const server = http.createServer((req, res) => {
-  res.writeHead(200, { 'Content-Type': 'text/plain' });
-  res.end('Todo App Running\n');
+  if (req.url === '/') {
+    res.writeHead(200, { 'Content-Type': 'text/html' });
+    res.end(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Todo App</title>
+        </head>
+        <body>
+          <h1>Todo App</h1>
+          <p>This is a simple todo application.</p>
+        </body>
+      </html>
+    `);
+  } else {
+    res.writeHead(404, { 'Content-Type': 'text/plain' });
+    res.end('Not Found\n');
+  }
 });
 
 server.listen(PORT, () => {
