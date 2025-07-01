@@ -192,3 +192,75 @@ curl localhost:8082/
       </html>
 
 ```
+
+# 1.8: The project, step 5
+
+## Instructions
+Switch to using Ingress instead of NodePort to access the project. You can delete the Ingress of the "Log output" application so they don't interfere with this exercise. We'll look more into paths and routing in the next exercise, and at that point, you can configure the project to run with the "Log output" application side by side.
+
+## Solution
+```
+# Create k3d Cluster
+https://github.com/k3d-io/k3d/blob/main/docs/usage/exposing_services.md
+k3d cluster create -p "8081:80@loadbalancer" --agents 2
+"map port 8081 from the host to port 80 on the container which matches the nodefilter loadbalancer" - the loadbalancer nodefilter matches only the serverlb that's deployed in front of a cluster's server nodes - all ports exposed on the serverlb will be proxied to the same ports on all server nodes in the cluster.
+unset KUBECONFIG 
+k3d kubeconfig merge k3s-default --kubeconfig-merge-default
+kubectl cluster-info
+kubectl cluster-info dump
+
+# Docker containers k3d Infra
+docker ps
+CONTAINER ID   IMAGE                            COMMAND                  CREATED         STATUS         PORTS                                                            NAMES
+d4eee2d508ed   ghcr.io/k3d-io/k3d-proxy:5.4.1   "/bin/sh -c nginx-pr…"   5 minutes ago   Up 5 minutes   0.0.0.0:8081->80/tcp, :::8081->80/tcp, 0.0.0.0:32789->6443/tcp   k3d-k3s-default-serverlb
+ff994135f47b   rancher/k3s:v1.22.7-k3s1         "/bin/k3s agent"         5 minutes ago   Up 5 minutes                                                                    k3d-k3s-default-agent-1
+5a236ef0d6b6   rancher/k3s:v1.22.7-k3s1         "/bin/k3s agent"         5 minutes ago   Up 5 minutes                                                                    k3d-k3s-default-agent-0
+901643628f69   rancher/k3s:v1.22.7-k3s1         "/bin/k3s server --t…"   5 minutes ago   Up 5 minutes                                                                    k3d-k3s-default-server-0
+
+
+# Apply manifests
+kubectl apply -f manifests/deployment-todoapp.yaml
+deployment.apps/todo-app created
+kubectl apply -f manifests/service-todoapp.yaml 
+service/todo-app-service created
+kubectl apply -f manifests/ingress-todoapp.yaml 
+ingress.networking.k8s.io/todo-app-ingress created
+
+# Get svc
+kubectl get svc,ing
+NAME                       TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE
+service/kubernetes         ClusterIP   10.43.0.1       <none>        443/TCP    29m
+service/todo-app-service   ClusterIP   10.43.188.113   <none>        3000/TCP   96s
+
+NAME                                         CLASS    HOSTS   ADDRESS                            PORTS   AGE
+ingress.networking.k8s.io/todo-app-ingress   <none>   *       172.18.0.2,172.18.0.3,172.18.0.4   80      89s
+
+# Get pods
+kubectl get po
+NAME                        READY   STATUS    RESTARTS   AGE
+todo-app-7bfbdb5f99-8zd2l   1/1     Running   0          2m9s
+
+# Get Deployment
+kubectl get deployment
+NAME       READY   UP-TO-DATE   AVAILABLE   AGE
+todo-app   1/1     1            1           2m22s
+
+# Get ReplicaSet
+kubectl get rs
+NAME                  DESIRED   CURRENT   READY   AGE
+todo-app-7bfbdb5f99   1         1         1       2m38s
+
+# Test Ingress
+curl http://localhost:8081
+
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Todo App</title>
+        </head>
+        <body>
+          <h1>Todo App</h1>
+          <p>This is a simple todo application.</p>
+        </body>
+      </html>
+```
