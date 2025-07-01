@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   name: log-output-ingress
   #annotations:
-    #nginx.ingress.kubernetes.io/rewrite-target: /
+   # nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   rules:
     - http:
@@ -15,10 +15,10 @@ spec:
                 name: log-output-service
                 port:
                   number: 3001
-          - path: /
+          - path: /ping-pong
             pathType: Prefix
             backend:
               service:
-                name: log-output-service
+                name: ping-pong-service
                 port:
-                  number: 3001
+                  number: 3002
