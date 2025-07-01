@@ -11,5 +11,6 @@
 |[1.6: The project,step 4](https://github.com/PaulaJuliaBalza/devops-with-kubernetes/tree/1.6) |
 |[1.7: External access with Ingress](https://github.com/PaulaJuliaBalza/devops-with-kubernetes/tree/1.7) |
 |[1.8: The project,step 5](https://github.com/PaulaJuliaBalza/devops-with-kubernetes/tree/1.8) |
+|[1.9: More services](https://github.com/PaulaJuliaBalza/devops-with-kubernetes/tree/1.9) |
 
 ## Chapter 3: 
